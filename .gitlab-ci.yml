@@ -373,7 +373,8 @@ rollout 100%:
   }
 
   function persist_environment_url() {
-      echo $CI_ENVIRONMENT_URL > environment_url.txt
+      echo "persist_environment_url..."
+      $CI_ENVIRONMENT_URL > environment_url.txt
   }
 
   function delete() {
