@@ -20,6 +20,7 @@
 # * review: REVIEW_DISABLED
 # * stop_review: REVIEW_DISABLED
 #
+#
 # In order to deploy, you must have a Kubernetes cluster configured either
 # via a project integration, or via group/project variables.
 # AUTO_DEVOPS_DOMAIN must also be set as a variable at the group or project
