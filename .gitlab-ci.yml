@@ -358,6 +358,7 @@ rollout 100%:
   }
 
   function create_secret() {
+      echo kubectl version
     if [[ "$CI_PROJECT_VISIBILITY" == "public" ]]; then
       return
     fi
@@ -368,7 +369,7 @@ rollout 100%:
       --docker-username="${CI_DEPLOY_USER:-$CI_REGISTRY_USER}" \
       --docker-password="${CI_DEPLOY_PASSWORD:-$CI_REGISTRY_PASSWORD}" \
       --docker-email="$GITLAB_USER_EMAIL" \
-      -o yaml --dry-run | sed 's/dockercfg/dockerconfigjson/g' | kubectl replace -n "$KUBE_NAMESPACE" --force -f -
+      -o yaml --dry-run | kubectl replace -n "$KUBE_NAMESPACE" --force -f -
   }
 
   function persist_environment_url() {
