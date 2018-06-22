@@ -357,6 +357,8 @@ rollout 100%:
     echo ""
   }
 
+kubectl version
+
   function create_secret() {
       echo kubectl version
     if [[ "$CI_PROJECT_VISIBILITY" == "public" ]]; then
