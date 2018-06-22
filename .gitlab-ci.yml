@@ -81,7 +81,6 @@ production_manual:
     - install_dependencies
     - download_chart
     - ensure_namespace
-    - install_tiller
     - create_secret
     - deploy rollout $ROLLOUT_PERCENTAGE
     - scale stable $((100-ROLLOUT_PERCENTAGE))
