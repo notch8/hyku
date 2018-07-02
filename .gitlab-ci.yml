@@ -364,7 +364,7 @@ rollout 100%:
       return
     fi
 
-    kubectl create secret -n "Test" \
+    kubectl create secret -n "$KUBE_NAMESPACE" \
       docker-registry gitlab-registry \
       --docker-server="$CI_REGISTRY" \
       --docker-username="${CI_DEPLOY_USER:-$CI_REGISTRY_USER}" \
