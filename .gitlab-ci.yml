@@ -1,8 +1,6 @@
 image: alpine:latest
 
 variables:
-  # AUTO_DEVOPS_DOMAIN is the application deployment domain and should be set as a variable at the group or project level.
-  #AUTO_DEVOPS_DOMAIN: 35.197.80.27.nip.io
   POSTGRES_USER: user
   POSTGRES_PASSWORD: testing-password
   POSTGRES_ENABLED: "true"
@@ -72,8 +70,6 @@ production_manual:
     variables:
       - $INCREMENTAL_ROLLOUT_ENABLED
 
-# This job implements incremental rollout on for every push to `master`.
-
 .rollout: &rollout_template
   stage: production
   script:
@@ -140,7 +136,6 @@ rollout 100%:
     variables:
       - $INCREMENTAL_ROLLOUT_ENABLED
 
-# ---------------------------------------------------------------------------
 
 .auto_devops: &auto_devops |
   # Auto DevOps variables and functions
@@ -376,7 +371,7 @@ rollout 100%:
 
   function persist_environment_url() {
       echo "persist_environment_url..."
-      $CI_ENVIRONMENT_URL > environment_url.txt
+   #   $CI_ENVIRONMENT_URL > environment_url.txt
   }
 
   function delete() {
