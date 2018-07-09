@@ -172,24 +172,6 @@ services:
     depends_on:
       - db
 
-  lb:
-    image: dockercloud/haproxy:1.5.3
-    links:
-      - web
-    environment:
-      - DOCKER_TLS_VERIFY
-      - DOCKER_HOST
-      - DOCKER_CERT_PATH
-    ports:
-      - 8080:80
-      - 8443:443
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      # You must uncomment this line if and only if you are running docker-machine
-      # - $DOCKER_CERT_PATH:$DOCKER_CERT_PATH
-    networks:
-      internal:
-      external:
 
   redis:
     image: redis:3
