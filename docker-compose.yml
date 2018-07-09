@@ -137,6 +137,8 @@ services:
       - zoo3
       - memcache
       - db_migrate
+    ports:
+      - 3000:3000
     expose:
       - 3000
 
