@@ -1,8 +1,6 @@
 image: alpine:latest
 
 variables:
-  # AUTO_DEVOPS_DOMAIN is the application deployment domain and should be set as a variable at the group or project level.
-  AUTO_DEVOPS_DOMAIN: 1.2.3.4.nip.io
   POSTGRES_USER: user
   POSTGRES_PASSWORD: testing-password
   POSTGRES_ENABLED: "true"
@@ -34,6 +32,7 @@ build:
     - install_dependencies
     - download_chart
     - ensure_namespace
+    - install_tiller
     - create_secret
     - deploy
     - delete canary
@@ -71,8 +70,6 @@ production_manual:
     variables:
       - $INCREMENTAL_ROLLOUT_ENABLED
 
-# This job implements incremental rollout on for every push to `master`.
-
 .rollout: &rollout_template
   stage: production
   script:
@@ -80,6 +77,7 @@ production_manual:
     - install_dependencies
     - download_chart
     - ensure_namespace
+    - install_tiller
     - create_secret
     - deploy rollout $ROLLOUT_PERCENTAGE
     - scale stable $((100-ROLLOUT_PERCENTAGE))
@@ -138,10 +136,9 @@ rollout 100%:
     variables:
       - $INCREMENTAL_ROLLOUT_ENABLED
 
-# ---------------------------------------------------------------------------
 
 .auto_devops: &auto_devops |
-  # Auto DevOps variables and functions
+  #  Auto DevOps variables and functions
   [[ "$TRACE" ]] && set -x
   auto_database_url=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${CI_ENVIRONMENT_SLUG}-postgres:5432/${POSTGRES_DB}
   export DATABASE_URL=${DATABASE_URL-$auto_database_url}
@@ -272,7 +269,7 @@ rollout 100%:
   function setup_docker() {
     if ! docker info &>/dev/null; then
       if [ -z "$DOCKER_HOST" -a "$KUBERNETES_PORT" ]; then
-        export DOCKER_HOST='tcp://localhost:2375'
+        export DOCKER_HOST='tcp://localhost:3000'
       fi
     fi
   }
@@ -358,13 +355,12 @@ rollout 100%:
 
 
   function create_secret() {
-      echo "kubectl version"
       kubectl version
     if [[ "$CI_PROJECT_VISIBILITY" == "public" ]]; then
       return
     fi
 
-    kubectl create secret -n "Test" \
+    kubectl create secret -n "$KUBE_NAMESPACE" \
       docker-registry gitlab-registry \
       --docker-server="$CI_REGISTRY" \
       --docker-username="${CI_DEPLOY_USER:-$CI_REGISTRY_USER}" \
@@ -375,7 +371,7 @@ rollout 100%:
 
   function persist_environment_url() {
       echo "persist_environment_url..."
-      $CI_ENVIRONMENT_URL > environment_url.txt
+   #   $CI_ENVIRONMENT_URL > environment_url.txt
   }
 
   function delete() {
