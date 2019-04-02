@@ -107,7 +107,7 @@ fr:
             default_images: Images par défaut
             colors: Couleurs
             custom_css: Personnaliser CSS
-            fonts: Les Polices
+            fonts: Les polices
       sidebar:
         accounts: Comptes
         activity_summary: Résumé de l'activité

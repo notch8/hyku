@@ -106,6 +106,7 @@ zh:
             banner_image: 横幅图像
             default_images: 默认图像
             colors: 颜色
+            fonts: 字形
       sidebar:
         accounts: 帐号
         activity_summary: 活动摘要

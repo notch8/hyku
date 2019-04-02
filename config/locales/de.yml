@@ -106,6 +106,7 @@ de:
             banner_image: Banner Bild
             default_images: Standardbilder
             colors: Farben
+            fonts: Schriftarten
             custom_css: Maßgeschneidert CSS
       sidebar:
         accounts: Konten

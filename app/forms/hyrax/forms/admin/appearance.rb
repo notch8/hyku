@@ -34,6 +34,16 @@ module Hyrax
           true
         end
 
+        # The font for the body copy
+        def body_font
+          block_for('body_font', '"Helvetica Neue", Helvetica, Arial, sans-serif;')
+        end
+
+        # The font for the headline copy
+        def headline_font
+          block_for('headline_font', '"Helvetica Neue", Helvetica, Arial, sans-serif;')
+        end
+
         # The color for the background of the header and footer bars
         def header_background_color
           block_for('header_background_color', '#3c3c3c')
@@ -220,7 +230,8 @@ module Hyrax
 
         # A list of parameters that are related to custom colors
         def self.customization_params
-          [:header_background_color,
+          [
+           :header_background_color,
            :header_text_color,
            :link_color,
            :link_hover_color,
@@ -239,6 +250,21 @@ module Hyrax
            :searchbar_text_hover_color,
            :custom_css_block
           ]
+        end
+
+        def font_import_url
+          headline = headline_font.split('|').first.to_s.gsub(" ", "+")
+          body = body_font.split('|').first.to_s.gsub(" ", "+")
+
+          import_url = "http://fonts.googleapis.com/css?family=#{headline}|#{body}".html_safe
+        end
+
+        def font_body_family
+          format_font_names(body_font)
+        end
+
+        def font_headline_family
+          format_font_names(headline_font)
         end
 
         private
@@ -270,6 +296,12 @@ module Hyrax
           def update_block(name, value)
             ContentBlock.find_or_create_by(name: name.to_s).update!(value: value)
           end
+
+          def format_font_names(font_style)
+            parts = font_style.split('|')
+            "'#{parts[0]}', #{parts[1]}".html_safe
+          end
+  
       end
     end
   end

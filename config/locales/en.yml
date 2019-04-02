@@ -133,6 +133,7 @@ en:
             banner_image: 'Banner Image'
             default_images: 'Default Images'
             colors: 'Colors'
+            fonts: 'Fonts'
             custom_css: Custom CSS
       sidebar:
         accounts:                     'Accounts'
