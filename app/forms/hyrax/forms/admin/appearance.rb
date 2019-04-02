@@ -19,9 +19,9 @@ module Hyrax
           ActiveModel::Name.new(self, Hyrax, "Hyrax::Admin::Appearance")
         end
 
-        # Override this method if your form takes more than just the color_params
+        # Override this method if your form takes more than just the customization_params
         def self.permitted_params
-          color_params
+          customization_params
         end
 
         # Required to back a form
@@ -134,6 +134,11 @@ module Hyrax
           darken_color(primary_button_border_color, 0.25)
         end
 
+        # The custom css module
+        def custom_css_block
+          block_for('custom_css_block', '/* custom stylesheet */').html_safe
+        end
+
         # DEFAULT BUTTON COLORS
         
         # The background color for "default" buttons
@@ -208,13 +213,13 @@ module Hyrax
 
         # Persist the form values
         def update!
-          self.class.color_params.each do |field|
+          self.class.customization_params.each do |field|
             update_block(field, attributes[field]) if attributes[field]
           end
         end
 
         # A list of parameters that are related to custom colors
-        def self.color_params
+        def self.customization_params
           [:header_background_color,
            :header_text_color,
            :link_color,
@@ -231,7 +236,8 @@ module Hyrax
            :searchbar_background_color,
            :searchbar_background_hover_color,
            :searchbar_text_color,
-           :searchbar_text_hover_color
+           :searchbar_text_hover_color,
+           :custom_css_block
           ]
         end
 
