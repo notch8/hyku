@@ -17,5 +17,6 @@
  *= require peek/views/faraday
  *= require peek/views/performance_bar
  *= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
+ *= require fontselect
  *= require_self
  */
