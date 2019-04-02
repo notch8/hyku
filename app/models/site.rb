@@ -9,6 +9,12 @@ class Site < ApplicationRecord
   # Allow for uploading of site's logo image
   mount_uploader :logo_image, LogoImageUploader
 
+  # Allow for uploading of site's default collection image
+  mount_uploader :default_collection_image, DefaultCollectionImageUploader
+  
+  # Allow for uploading of site's default work image
+  mount_uploader :default_work_image, DefaultWorkImageUploader
+
   belongs_to :account
   accepts_nested_attributes_for :account, update_only: true
 
