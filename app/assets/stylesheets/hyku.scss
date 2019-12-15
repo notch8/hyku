@@ -1,6 +1,9 @@
 #masthead {
   #logo {
     margin-left: 10px;
+    img {
+      max-height: 50px;
+    }
   }
 
   .navbar-right {
@@ -12,6 +15,13 @@
   }
 }
 
+@media (min-width: $screen-sm-min) {
+  .logo-set {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
 
 .jumbotron {
   background: image_url('white-cloud-background.jpg') repeat-x;
@@ -198,5 +208,14 @@ footer.navbar {
   h5,
   h6 {
     color: $brand-danger;
+  }
+}
+
+.logo-set {
+  min-height: 320px;
+
+  img {
+    display: inline;
+    vertical-align: middle;
   }
 }

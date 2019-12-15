@@ -10,14 +10,15 @@
 // Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 // about supported directives.
 //
+//= require codemirror
+//= require codemirror-autorefresh
+//= require codemirror/modes/css
+
 //= require jquery3
 //= require jquery_ujs
 //= require dataTables/jquery.dataTables
 //= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
 //= require turbolinks
-//= require peek
-//= require peek/views/faraday
-//= require peek/views/performance_bar
 // Required by Blacklight
 //= require blacklight/blacklight
 
@@ -32,3 +33,5 @@
 //= require flot_graph
 //= require statistics_tab_manager
 //= require blacklight_gallery/default
+
+//= require jquery.fontselect

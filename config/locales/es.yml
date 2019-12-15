@@ -77,6 +77,8 @@ es:
       accounts:
         nav: Cuentas
     splash:
+      account_denied: No estás autorizado para crear inquilinos.
+      account_login: Inicia sesión para comenzar
       account_signup: Empezar
       center_heading: Rico en funciones
       center_text: Todas las características que usted esperaría de un sistema de repositorio maduro. Soporta una variedad de tipos de contenido y casos de uso.
@@ -100,21 +102,34 @@ es:
         show:
           hints:
             banner_image: Para utilizar una imagen como fondo de masthead, debe utilizar una imagen (JPG, GIF o PNG) que tenga al menos 120 píxeles de alto y 1200 píxeles de ancho. Para obtener mejores resultados, utilice una imagen de al menos 1800 píxeles de ancho.
+            logo_image: Para usar una imagen como logotipo, debe usar una imagen (JPG, GIF o PNG) que no sea más alta que el encabezado y que no tenga más de 400 píxeles de ancho.
+            default_image: Para las imágenes predeterminadas, debe usar una imagen (JPG, GIF o PNG) que tenga las mismas dimensiones de alto y ancho (100 píxeles de ancho y 100 píxeles de alto)
           tabs:
             banner_image: Imagen de la Bandera
+            default_images: Imágenes predeterminadas
             colors: Colores
+            custom_css: Personnaliser CSS
+            fonts: Fuentes
       sidebar:
         accounts: Cuentas
         activity_summary: Resumen de la actividad
-        content_blocks: Bloques de contenido
         labels: Etiquetas
-        manage_groups: Administrar grupos
-        manage_roles_and_permissions: Defina roles y permisos
-        manage_users: Administrar usuarios
-        repository_activity: Actividad de repositorio
-        roles_and_permissions: Usarios y grupos
+        manage_groups: Administrar Grupos
         system_status: Estado del sistema
-        technical: Técnico
+      users:
+        destroy:
+          confirmation: ¿Estás seguro de que deseas eliminar el usuario "%{user}"? Esta acción es irreversible.
+          failure: El usuario "%{user}" no pudo ser eliminado.
+          success: El usuario "%{user}" ha sido eliminado exitosamente.
+        index:
+          action_label: Acción
+          add: Invitar al usuario
+          delete: Borrar
+          invite_users: Agregar o invitar al usuario por correo electrónico
+          status:
+            active: Activo
+            pending: Pendiente
+          status_label: Estado
   proprietor:
     accounts:
       edit:

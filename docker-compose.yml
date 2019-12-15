@@ -6,10 +6,9 @@ volumes:
   db:
   redis:
   zk1:
-  zk2:
-  zk3:
   zkconf:
   app:
+  assets:
 
 networks:
   external:
@@ -21,7 +20,7 @@ services:
     restart: always
     environment:
       - ZOO_MY_ID=1
-      - ZOO_SERVERS=server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
+      - ZOO_SERVERS=server.1=zoo1:2888:3888
     expose:
       - 2181
       - 2888
@@ -33,48 +32,12 @@ services:
       internal:
        aliases:
          - zookeeper_cluster
-  zoo2:
-    image: zookeeper
-    restart: always
-    environment:
-      - ZOO_MY_ID=2
-      - ZOO_SERVERS=server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
-    expose:
-      - 2181
-      - 2888
-      - 3888
-    volumes:
-      - zk2:/data
-      - zkconf:/conf
-    networks:
-      internal:
-       aliases:
-         - zookeeper_cluster
-  zoo3:
-    image: zookeeper
-    restart: always
-    environment:
-      - ZOO_MY_ID=3
-      - ZOO_SERVERS=server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
-    expose:
-      - 2181
-      - 2888
-      - 3888
-    volumes:
-      - zk3:/data
-      - zkconf:/conf
-    networks:
-      internal:
-       aliases:
-         - zookeeper_cluster
 
   solr:
     image: solr
-    command: solr -c -f -z zookeeper_cluster:2181
+    command: solr -c -f -z zoo1:2181
     depends_on:
       - zoo1
-      - zoo2
-      - zoo3
     expose:
       - 8983
     volumes:
@@ -85,6 +48,8 @@ services:
 
   fcrepo:
     image: cbeer/fcrepo4:4.7
+    env_file:
+      - .env
     expose:
       - 8080
     volumes:
@@ -96,100 +61,99 @@ services:
 
   db:
     image: postgres
+    env_file:
+      - .env
     volumes:
       - db:/var/lib/postgresql/data
     networks:
       internal:
 
+  base:
+    image: hyku/base:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+    env_file:
+      - .env
+
   app:
     build: .
+    image: hyku/main:latest
+    env_file:
+      - .env
     environment:
-      - REDIS_HOST=redis
       - DATABASE_URL=postgresql://postgres@db/postgres
       - FEDORA_URL=http://fcrepo:8080/fcrepo/rest
-      - SOLR_URL=http://solr:8983/solr/
+      - IN_DOCKER=true
+      - LD_LIBRARY_PATH=/opt/fits/tools/mediainfo/linux
+      - RAILS_LOG_TO_STDOUT=true
+      - REDIS_HOST=redis
+      - SECRET_KEY_BASE=asdf
       - SETTINGS__ACTIVE_JOB__QUEUE_ADAPTER=sidekiq
+      - SETTINGS__FITS_PATH=/opt/fits/fits.sh
+      - SETTINGS__MULTITENANCY__ADMIN_HOST=hyku.docker
       - SETTINGS__MULTITENANCY__ADMIN_ONLY_TENANT_CREATION=false
+      - SETTINGS__MULTITENANCY__DEFAULT_HOST=%{tenant}.hyku.docker
+      - SETTINGS__MULTITENANCY__ENABLED=true
       - SETTINGS__SOLR__URL=http://solr:8983/solr/
       - SETTINGS__ZOOKEEPER__CONNECTION_STR=zookeeper_cluster:2181/configs
-      - RAILS_ENV=production
-      - RAILS_SERVE_STATIC_FILES=true
-      - RAILS_LOG_TO_STDOUT=true
-      - SECRET_KEY_BASE=asdf
-      - RAILS_CACHE_STORE_URL=memcache
-# version and location of fits are set in Dockerfile:
-      - LD_LIBRARY_PATH=/opt/fits-1.0.5/tools/mediainfo/linux
+      - SOLR_URL=http://solr:8983/solr/
     volumes:
-      - app:/data/tmp/uploads
+      - app:/home/app/webapp/tmp/uploads
+      - assets:/home/app/webapp/public/assets
+      - .:/home/app/webapp
     networks:
       internal:
 
   web:
-    extends: app
+    extends:
+      service: app
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails server -p 3000 -b '0.0.0.0'"
+    environment:
+      - VIRTUAL_PORT=3000
+      - VIRTUAL_HOST=hyku.docker
     depends_on:
       - db
       - solr
       - fcrepo
       - redis
       - zoo1
-      - zoo2
-      - zoo3
-      - memcache
+      - chrome
+      - initialize_app
       - db_migrate
     expose:
-      - 3000
+      - 80
+    ports: 
+    - 3000:3000
 
   workers:
-    extends: app
+    extends:
+      service: app
     command: bundle exec sidekiq
-    environment:
-      - SETTINGS__FITS_PATH=/opt/fits-1.0.5/fits.sh
     depends_on:
       - db
       - solr
       - fcrepo
       - redis
       - zoo1
-      - zoo2
-      - zoo3
       - initialize_app
       - db_migrate
 
   initialize_app:
-    extends: app
+    extends:
+      service: app
     restart: on-failure
     command: bundle exec rails zookeeper:upload
     depends_on:
       - zoo1
-      - zoo2
-      - zoo3
 
   db_migrate:
-    extends: app
+    extends:
+      service: app
     restart: on-failure
     command: bundle exec rails db:migrate
     depends_on:
       - db
-
-  lb:
-    image: dockercloud/haproxy:1.5.3
-    links:
-      - web
-    environment:
-      - DOCKER_TLS_VERIFY
-      - DOCKER_HOST
-      - DOCKER_CERT_PATH
-    ports:
-      - 8080:80
-      - 8443:443
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      # You must uncomment this line if and only if you are running docker-machine
-      # - $DOCKER_CERT_PATH:$DOCKER_CERT_PATH
-    networks:
-      internal:
-      external:
 
   redis:
     image: redis:3
@@ -199,7 +163,7 @@ services:
     networks:
       internal:
 
-  memcache:
-    image: memcached
+  chrome:
+    image: selenium/standalone-chrome
     networks:
       internal:

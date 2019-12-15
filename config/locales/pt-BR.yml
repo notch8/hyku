@@ -77,6 +77,8 @@ pt-BR:
       accounts:
         nav: Contas
     splash:
+      account_denied: Você não está autorizado a criar inquilinos
+      account_login: Inicie sessão para começar
       account_signup: Iniciar
       center_heading: Rico em Recursos
       center_text: Todos os recursos que você esperaria de um sistema de repositório maduro. Suporta uma variedade de tipos de conteúdo e casos de uso.
@@ -100,21 +102,33 @@ pt-BR:
         show:
           hints:
             banner_image: Para usar uma imagem como um fundo de masthead, você deve usar uma imagem (JPG, GIF ou PNG) com pelo menos 120 pixels de altura e 1200 pixels de largura. Para obter melhores resultados, use uma imagem de pelo menos 1800 pixels de largura.
+            logo_image: Para usar uma imagem como logotipo, você deve usar uma imagem (JPG, GIF ou PNG) que não seja mais alta que o cabeçalho e não tenha mais de 400 pixels de largura.
+            default_image: Para imagens padrão, você deve usar uma imagem (JPG, GIF ou PNG) que tenha dimensões de altura e largura iguais (100 pixels de largura e 100 pixels de altura)
           tabs:
             banner_image: Imagem do banner
+            default_images: Imagens padrão
             colors: Cores
+            fonts: Fontes
       sidebar:
         accounts: Contas
         activity_summary: Resumo da atividade
-        content_blocks: Blocos de conteúdo
         labels: Etiquetas
         manage_groups: Gerenciar grupos
-        manage_roles_and_permissions: Definir funções e permissões
-        manage_users: Gerenciar usuários
-        repository_activity: Atividade do depósito
-        roles_and_permissions: Usuários e grupos
         system_status: Status do sistema
-        technical: Técnico
+      users:
+        destroy:
+          confirmation: Tem certeza de que deseja excluir o usuário "%{user}"? Esta ação é irreversível.
+          failure: O usuário "%{user}" não pôde ser excluído.
+          success: O usuário "%{user}" foi excluído com sucesso.
+        index:
+          action_label: Açao
+          add: Convidar Usuário
+          delete: Excluir
+          invite_users: Adicionar ou Convidar usuário por email
+          status:
+            active: Ativo
+            pending: Pendente
+          status_label: Status
   proprietor:
     accounts:
       edit:

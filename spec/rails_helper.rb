@@ -1,5 +1,12 @@
-# This file is copied to spec/ when you run 'rails generate rspec:install'
+# This file is cepied to spec/ when you run 'rails generate rspec:install'
 ENV['RAILS_ENV'] ||= 'test'
+
+# In test most, unset some variables that can cause trouble
+# before booting up Rails
+ENV['SETTINGS__MULTITENANCY__ADMIN_HOST'] = nil
+ENV['SETTINGS__MULTITENANCY__ADMIN_ONLY_TENANT_CREATION'] = nil
+ENV['SETTINGS__MULTITENANCY__DEFAULT_HOST'] = nil
+ENV['SETTINGS__MULTITENANCY__ENABLED'] = nil
 
 require 'simplecov'
 require 'coveralls'
@@ -11,7 +18,7 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new(
 )
 SimpleCov.start('rails')
 
-require File.expand_path('../../config/environment', __FILE__)
+require File.expand_path('../config/environment', __dir__)
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'spec_helper'
@@ -19,6 +26,7 @@ require 'rspec/rails'
 require 'capybara/rails'
 require 'database_cleaner'
 require 'active_fedora/cleaner'
+require 'factory_bot'
 
 # Add additional requires below this line. Rails is not loaded until this point!
 
@@ -54,19 +62,50 @@ ActiveRecord::Migration.maintain_test_schema!
 # Uses faster rack_test driver when JavaScript support not needed
 Capybara.default_driver = :rack_test
 
-Capybara.register_driver :headless_chrome do |app|
+if ENV['CHROME_HOSTNAME'].present?
+  capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
+    chromeOptions: {
+      args: %w[headless disable-gpu no-sandbox whitelisted-ips window-size=1400,1400]
+    }
+  )
+
+  Capybara.register_driver :chrome do |app|
+    d = Capybara::Selenium::Driver.new(app,
+                                       browser: :remote,
+                                       desired_capabilities: capabilities,
+                                       url: "http://#{ENV['CHROME_HOSTNAME']}:4444/wd/hub")
+    # Fix for capybara vs remote files. Selenium handles this for us
+    d.browser.file_detector = lambda do |args|
+      str = args.first.to_s
+      str if File.exist?(str)
+    end
+    d
+  end
+  Capybara.server_host = '0.0.0.0'
+  Capybara.server_port = 3001
+  ENV['WEB_HOST'] ||= if ENV['IN_DOCKER']
+                        'web'
+                      else
+                        `hostname -s`.strip
+                      end
+  Capybara.app_host = "http://#{ENV['WEB_HOST']}:#{Capybara.server_port}"
+else
   capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
     chromeOptions: {
       args: %w[headless disable-gpu]
     }
   )
-  Capybara::Selenium::Driver.new(
-    app,
-    browser: :chrome,
-    desired_capabilities: capabilities
-  )
+
+  Capybara.register_driver :chrome do |app|
+    Capybara::Selenium::Driver.new(
+      app,
+      browser: :chrome,
+      desired_capabilities: capabilities
+    )
+  end
 end
-Capybara.javascript_driver = :headless_chrome
+
+Capybara.javascript_driver = :chrome
 
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
@@ -99,12 +138,13 @@ RSpec.configure do |config|
 
   config.include Devise::Test::ControllerHelpers, type: :controller
   config.include Fixtures::FixtureFileUpload
-  config.include FactoryGirl::Syntax::Methods
+  config.include FactoryBot::Syntax::Methods
   config.include ApplicationHelper, type: :view
   config.include Warden::Test::Helpers, type: :feature
 
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
+    CreateSolrCollectionJob.new.without_account('hyku-test') if ENV['IN_DOCKER']
   end
 
   config.before(:each) do |example|

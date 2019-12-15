@@ -16,7 +16,7 @@ RSpec.describe SolrEndpoint do
     let(:af_options) do
       { read_timeout: 120,
         open_timeout: 120,
-        url: "http://127.0.0.1:8985/solr/hydra-test" }
+        url: "http://127.0.0.1:8985/solr/hyku-test" }
     end
 
     before do
@@ -43,6 +43,7 @@ RSpec.describe SolrEndpoint do
       # Mocking on the subject, because mocking RSolr.connect causes doubles to leak for some reason
       allow(subject).to receive(:connection).and_return(mock_connection)
     end
+
     it 'checks if the service is up' do
       allow(mock_connection).to receive(:get).with('admin/ping').and_return('status' => 'OK')
       expect(subject.ping).to be_truthy

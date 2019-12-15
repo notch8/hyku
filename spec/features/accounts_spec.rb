@@ -1,17 +1,23 @@
 RSpec.describe 'Accounts administration', multitenant: true do
   context 'as an superadmin' do
-    let(:user) { FactoryGirl.create(:superadmin) }
+    let(:user) { FactoryBot.create(:superadmin) }
     let(:account) do
-      FactoryGirl.create(:account, solr_endpoint_attributes: { url: 'http://localhost:8080/solr' },
-                                   fcrepo_endpoint_attributes: { url: 'http://localhost:8080/fcrepo' })
+      FactoryBot.create(:account, solr_endpoint_attributes: { url: 'http://localhost:8080/solr' },
+                                  fcrepo_endpoint_attributes: { url: 'http://localhost:8080/fcrepo' })
     end
 
     before do
       login_as(user, scope: :user)
-      Capybara.default_host = "http://#{Account.admin_host}"
       allow(Apartment::Tenant).to receive(:switch).with(account.tenant) do |&block|
         block.call
       end
+    end
+
+    around do |example|
+      default_host = Capybara.default_host
+      Capybara.default_host = Capybara.app_host || "http://#{Account.admin_host}"
+      example.run
+      Capybara.default_host = default_host
     end
 
     it 'changes the associated cname' do
